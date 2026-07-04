@@ -1,0 +1,16 @@
+node_modules/
+.env
+.DS_Store
+dist/
+*.tsbuildinfo
+
+# foundry
+contracts/out/
+contracts/cache/
+contracts/lib/
+
+# evidence store (content-addressed bundles)
+deployments/evidence/
+
+# keep the deployment manifest template but ignore live one if you prefer:
+# deployments/monadTestnet.json

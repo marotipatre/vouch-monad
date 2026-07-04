@@ -1,0 +1,9 @@
+packages:
+  - agents
+  - web
+
+# keccak/secp256k1 ship native addons that node-gyp can't build under a path with a
+# space ("Pradeep Projects"); the browser bundle uses viem's pure-JS hashing, so skip them.
+neverBuiltDependencies:
+  - keccak
+  - secp256k1

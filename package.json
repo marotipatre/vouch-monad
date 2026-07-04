@@ -1,0 +1,25 @@
+{
+  "name": "vouch-monad",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Vouch on Monad — hire AI agents, insure the result, verify it on-chain (no DeepBook).",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build:contracts": "tsx scripts/compile.ts",
+    "build:contracts:forge": "cd contracts && forge build",
+    "test:contracts": "cd contracts && forge test -vv",
+    "keys": "tsx scripts/keys.ts",
+    "deploy": "tsx scripts/deploy.ts",
+    "seed": "tsx scripts/seed.ts",
+    "setup": "tsx scripts/keys.ts && tsx scripts/compile.ts && tsx scripts/deploy.ts && tsx scripts/seed.ts",
+    "agents": "pnpm --filter @vouch-monad/agents serve",
+    "web": "pnpm --filter @vouch-monad/web dev"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.0",
+    "solc": "^0.8.26",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "viem": "^2.21.0"
+  }
+}

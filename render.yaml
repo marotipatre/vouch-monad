@@ -1,0 +1,34 @@
+# Render blueprint for the Vouch backend (the agent + auditor service).
+# Deploy: Render dashboard → New → Blueprint → connect this repo → set the 3 secret
+# env vars (marked sync:false) in the dashboard → Apply.
+#
+# The backend is a long-running Express server (SSE settlement + on-chain signing +
+# evidence store) — which is why it runs here, not on Vercel serverless.
+services:
+  - type: web
+    name: vouch-monad-backend
+    runtime: node
+    plan: free
+    region: oregon
+    # --prod=false so pnpm keeps devDependencies (tsx runs the TypeScript server).
+    buildCommand: pnpm install --prod=false
+    startCommand: pnpm --filter @vouch-monad/agents serve
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONAD_RPC
+        value: https://testnet-rpc.monad.xyz
+      - key: MONAD_CHAIN_ID
+        value: "10143"
+      - key: EXPLORER_URL
+        value: https://testnet.monadexplorer.com
+      - key: LLM_PROVIDER
+        value: groq
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      # Secrets — set these in the Render dashboard (not committed):
+      - key: DEPLOYER_PRIVATE_KEY
+        sync: false
+      - key: AUDITOR_PRIVATE_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

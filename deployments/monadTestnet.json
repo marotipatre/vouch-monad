@@ -1,0 +1,11 @@
+{
+  "chainId": 10143,
+  "rpc": "https://testnet-rpc.monad.xyz",
+  "explorer": "https://testnet.monadexplorer.com",
+  "usdc": "",
+  "registry": "",
+  "insurance": "",
+  "resolver": "",
+  "auditorAgentId": 1,
+  "treasury": ""
+}

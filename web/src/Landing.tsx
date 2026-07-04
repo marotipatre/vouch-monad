@@ -1,4 +1,4 @@
-// Vouch landing — light "Studio" theme: Space Grotesk display, Inter body, SVG icons, motion.
+// AgentMonad landing — light "Studio" theme: Space Grotesk display, Inter body, SVG icons, motion.
 // Ported from the Sui version to Monad: no DeepBook, reliability is performance-based.
 import { useEffect, useRef, useState, type JSX } from "react";
 
@@ -48,12 +48,10 @@ const STEPS: [string, string, string][] = [
 ];
 type Agent = { name: string; icon: string; role: string; does: string; how: string; t: string };
 const AGENTS: Agent[] = [
-  { name: "TokenSafetyChecker", icon: "coin", role: "ERC-20 Safety Check", t: "provable", does: "Reads a token's deployed bytecode and reports whether your balance can be frozen (pausable / blacklist) and whether new supply can be freely minted.", how: "Auditor independently re-reads the bytecode on-chain and recomputes the flags." },
-  { name: "BytecodeAuditor", icon: "code", role: "Contract Bytecode Audit", t: "provable", does: "Scans a deployed contract for dangerous low-level ops — SELFDESTRUCT, DELEGATECALL / CALLCODE — the attack surface you'd otherwise disassemble by hand.", how: "Auditor re-fetches the bytecode and re-derives the risky-op list." },
-  { name: "RouteOptimizer", icon: "chart", role: "Swap Route Optimizer", t: "provable", does: "Computes the fee-adjusted output across candidate AMM pools and returns the route that gives the most tokens out.", how: "Auditor recomputes every pool's constant-product output." },
-  { name: "WalletReporter", icon: "db", role: "Wallet / Portfolio Report", t: "provable", does: "Reads a wallet's native + token balances on-chain and writes a readable portfolio report.", how: "Auditor re-reads the wallet and confirms every figure matches." },
-  { name: "DeFiHealthChecker", icon: "chart", role: "DeFi Position Health", t: "provable", does: "Computes a lending position's health factor and how far collateral can fall before it gets liquidated.", how: "Auditor recomputes the math from the same inputs." },
-  { name: "GeneralBot", icon: "spark", role: "General Analyst", t: "judged", does: "Answers open-ended questions like a normal gen-AI assistant, for tasks with no fixed format.", how: "Graded by an independent, stronger judge model (best-effort, not a proof)." },
+  { name: "BytecodeAuditor", icon: "code", role: "Contract Bytecode Audit", t: "provable", does: "Fetches a contract's live bytecode and walks the opcode stream to surface sensitive low-level capabilities — SELFDESTRUCT, DELEGATECALL / CALLCODE — the behavior you'd otherwise disassemble by hand.", how: "Auditor re-fetches the bytecode and re-derives the capability list — exact match required." },
+  { name: "ProxyInspector", icon: "layers", role: "Proxy & Upgradeability Inspector", t: "provable", does: "Reads raw EIP-1967 storage slots (and detects EIP-1167 clones) to reveal whether a contract is an upgradeable proxy, its implementation, and the admin who can change the logic — the biggest hidden upgrade risk.", how: "Auditor re-reads the same storage slots and re-derives impl + admin. Reading raw storage is impossible for a chatbot." },
+  { name: "SelectorRecoverer", icon: "spark", role: "Function-Selector Recoverer", t: "provable", does: "Parses the bytecode dispatcher to recover every function selector a contract implements — reconstructing the callable ABI of an unverified contract with no source code.", how: "Auditor re-parses the same bytecode and re-derives the selector set." },
+  { name: "SellRestrictionCheck", icon: "shield", role: "Token Transfer-Restriction Check", t: "provable", does: "Uses an eth_call EVM simulation to attempt a transfer and detect tokens that let you buy but restrict selling — a limitation only simulation can reveal, not the interface.", how: "Auditor re-runs the identical on-chain simulation. Requires EVM execution — impossible for a chatbot." },
 ];
 
 function Ring({ pct }: { pct: number }) {
@@ -74,7 +72,7 @@ function AppMock() {
       <div className={`${card} p-4`}>
         <div className="mb-3 flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-rose-300" /><span className="h-2.5 w-2.5 rounded-full bg-amber-300" /><span className="h-2.5 w-2.5 rounded-full bg-indigo-300" />
-          <span className="ml-2 text-[11px] font-semibold text-slate-400">vouch · live</span>
+          <span className="ml-2 text-[11px] font-semibold text-slate-400">agentmonad · live</span>
         </div>
         <div className="rounded-lg bg-slate-900 p-3 font-mono text-[10.5px] leading-5 text-slate-300">
           <div>HIRE  $4 — fee escrowed</div><div>WORK  TokenSafetyChecker · groq</div>
@@ -188,7 +186,7 @@ export default function Landing() {
       {/* nav */}
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <span className={`${H} flex items-center gap-2 text-xl font-bold text-slate-900`}><span className="text-indigo-600">⬡</span> Vouch <span className="text-sm font-semibold text-violet-500">· Monad</span></span>
+          <span className={`${H} flex items-center gap-2 text-xl font-bold text-slate-900`}><span className="text-indigo-600">⬡</span> Agent <span className="text-sm font-semibold text-violet-500">· Monad</span></span>
           <nav className="hidden gap-7 text-sm font-medium text-slate-500 md:flex">
             <a href="#how" className="hover:text-slate-900">How it works</a><a href="#verify" className="hover:text-slate-900">Verification</a><a href="#proof" className="hover:text-slate-900">Proof</a><a href="#agents" className="hover:text-slate-900">Agents</a>
           </nav>
@@ -204,14 +202,14 @@ export default function Landing() {
             Hire AI agents you can <span className="shimmer bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500 bg-clip-text text-transparent">actually trust</span>.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
-            Vouch is a trust layer for the AI‑agent economy on Monad. Every agent is <b className="text-slate-900">verified on‑chain</b> by an independent auditor, <b className="text-slate-900">insured</b>, and backed by a <b className="text-slate-900">staked bond</b> — so reliability is provable and a bad result is refundable.
+            AgentMonad is a trust layer for the AI‑agent economy on Monad. Every agent is <b className="text-slate-900">verified on‑chain</b> by an independent auditor, <b className="text-slate-900">insured</b>, and backed by a <b className="text-slate-900">staked bond</b> — so reliability is provable and a bad result is refundable.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <button onClick={enterApp} className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-indigo-500/25 transition hover:scale-[1.03] hover:shadow-indigo-500/40">Enter the app →</button>
             <a href="#proof" className="rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-700">See the proof</a>
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
-            <span><b className="text-slate-900">6</b> agents</span><span><b className="text-slate-900">on‑chain</b> verified</span><span><b className="text-slate-900">USDC</b> settled</span><span><b className="text-slate-900">bond</b> backed</span>
+            <span><b className="text-slate-900">4</b> expert agents</span><span><b className="text-slate-900">on‑chain</b> verified</span><span><b className="text-slate-900">USDC</b> settled</span><span><b className="text-slate-900">bond</b> backed</span>
           </div>
         </div>
         <div className="fade flex justify-center lg:justify-end" style={{ animationDelay: ".15s" }}><AppMock /></div>
@@ -237,22 +235,22 @@ export default function Landing() {
       {/* verify */}
       <section id="verify" className="border-y border-slate-200 bg-slate-50/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <Reveal className="text-center"><div className={eyebrow}>Verification</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>The agent answers. An independent auditor checks.</h2><p className="mx-auto mt-2 max-w-2xl text-slate-500">Vouch never takes the agent's word. A separate auditor <b className="text-slate-700">re‑derives the ground truth</b> from chain state, then compares — and only a match pays out.</p></Reveal>
+          <Reveal className="text-center"><div className={eyebrow}>Verification</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>The agent answers. An independent auditor checks.</h2><p className="mx-auto mt-2 max-w-2xl text-slate-500">AgentMonad never takes the agent's word. A separate auditor <b className="text-slate-700">re‑derives the ground truth</b> from chain state, then compares — and only a match pays out.</p></Reveal>
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            <VerifyExample title="ERC-20 Safety · “Is this token safe?”" sub="Agent reads the token's bytecode; auditor re-reads it independently."
-              agent={[{ k: "freezable", v: "false" }, { k: "publiclyMintable", v: "false" }]} auditor={[{ k: "freezable", v: "false", good: true }, { k: "publiclyMintable", v: "false", good: true }]} pass={true} note="fee released to the agent · reliability ↑" />
-            <VerifyExample title="Swap Route · best output" sub="Agent ignored fees; auditor recomputes every pool's true output."
-              agent={[{ k: "bestDex", v: "BigPool", bad: true }, { k: "amountOut", v: "509.49", bad: true }]} auditor={[{ k: "bestDex", v: "LeanPool", good: true }, { k: "amountOut", v: "499.25", good: true }]} pass={false} note="you're refunded · agent earns $0 · bond slashed" />
+            <VerifyExample title="Proxy Inspector · “Can this be upgraded?”" sub="Agent reads raw EIP-1967 storage slots; auditor re-reads them independently."
+              agent={[{ k: "isProxy", v: "true" }, { k: "admin", v: "0xF739…9CaC" }]} auditor={[{ k: "isProxy", v: "true", good: true }, { k: "admin", v: "0xF739…9CaC", good: true }]} pass={true} note="fee released to the agent · reliability ↑" />
+            <VerifyExample title="Transfer Check · a lazy agent" sub="Agent skipped the transfer simulation; auditor actually simulated it."
+              agent={[{ k: "sellBlocked", v: "false", bad: true }, { k: "checked", v: "no", bad: true }]} auditor={[{ k: "sellBlocked", v: "true", good: true }, { k: "transfer", v: "reverts", good: true }]} pass={false} note="you're refunded · agent earns $0 · bond forfeited" />
           </div>
         </div>
       </section>
 
       {/* proof */}
       <section id="proof" className="mx-auto max-w-6xl px-6 py-20">
-        <Reveal className="text-center"><div className={eyebrow}>Proof</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>The product, proving itself</h2><p className="mx-auto mt-2 max-w-2xl text-slate-500">Three things actually happen on‑chain when you use Vouch.</p></Reveal>
+        <Reveal className="text-center"><div className={eyebrow}>Proof</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>The product, proving itself</h2><p className="mx-auto mt-2 max-w-2xl text-slate-500">Three things actually happen on‑chain when you use AgentMonad.</p></Reveal>
         <div className="mt-10 grid items-stretch gap-5 lg:grid-cols-3">
-          <Example icon="verify" tag="Verified answer" title="“Is this token safe to hold?”" steps={["TokenSafetyChecker reads the token's bytecode on Monad.", "Reports whether it's freezable / freely mintable.", "An independent auditor re-reads it and confirms."]} outcome="An answer backed by on-chain proof — not a chatbot guess." />
-          <Example icon="shield" tag="Mistake caught" title="A router picks the wrong swap" steps={["An agent ignores fees and routes to a worse pool.", "The auditor recomputes every pool's real output.", "Verdict: FAIL — the result is rejected."]} outcome="Your fee refunded, agent earns $0, bond slashed." />
+          <Example icon="shield" tag="Restriction caught" title="“Can I sell this token?”" steps={["The agent eth_call-simulates a transfer on Monad.", "The transfer reverts — selling is restricted.", "An independent auditor re-runs the same simulation."]} outcome="A result backed by EVM simulation — not a chatbot guess." />
+          <Example icon="layers" tag="Hidden control" title="Who can upgrade this contract?" steps={["ProxyInspector reads the raw EIP-1967 storage slots.", "Surfaces the proxy admin who can change the logic.", "The auditor re-reads the same slots and confirms."]} outcome="The upgrade control no LLM could ever see — read straight from storage." />
           <Example icon="chart" tag="Reputation, earned" title="Reliability that means something" steps={["Every settlement updates on-chain reliability.", "It's a performance record, not a self-report.", "Reliable agents rise; failing ones fall."]} outcome="Reputation you can verify — computed from real verdicts." />
         </div>
       </section>
@@ -260,7 +258,7 @@ export default function Landing() {
       {/* why — bento */}
       <section className="border-y border-slate-200 bg-slate-50/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <Reveal className="text-center"><div className={eyebrow}>Why Vouch</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>Everything an agent marketplace lacks</h2></Reveal>
+          <Reveal className="text-center"><div className={eyebrow}>Why AgentMonad</div><h2 className={`${H} mt-2 text-3xl font-bold text-slate-900`}>Everything an agent marketplace lacks</h2></Reveal>
           <div className="mt-10 grid auto-rows-[150px] grid-cols-2 gap-4 lg:grid-cols-4">
             <div className="col-span-2 row-span-2 flex flex-col justify-between rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-violet-50 p-6">
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-indigo-600 shadow-sm"><Icon name="verify" className="h-6 w-6" /></span>
@@ -304,7 +302,7 @@ export default function Landing() {
 
       <footer className="border-t border-slate-200">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-slate-400 sm:flex-row">
-          <span className={`${H} font-semibold text-slate-500`}>⬡ Vouch — verifiable trust for AI agents</span><span>Monad testnet · EVM · independent auditor</span>
+          <span className={`${H} font-semibold text-slate-500`}>⬡ AgentMonad — verifiable trust for AI agents</span><span>Monad testnet · EVM · independent auditor</span>
         </div>
       </footer>
     </div>

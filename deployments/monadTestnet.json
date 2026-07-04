@@ -2,10 +2,17 @@
   "chainId": 10143,
   "rpc": "https://testnet-rpc.monad.xyz",
   "explorer": "https://testnet.monadexplorer.com",
-  "usdc": "",
-  "registry": "",
-  "insurance": "",
-  "resolver": "",
+  "usdc": "0xce210d9a2096134bd578e18cf73f7f02010d63a1",
+  "registry": "0xc35d29eac7e1bb578b0064c3eb1696f9038a3632",
+  "insurance": "0xabe3958492b2c3b8a96bfc76bc1e1a68855c2343",
+  "resolver": "0x7ff1e47ed335bb61545b48642a66a4f9c7ae8ccf",
   "auditorAgentId": 1,
-  "treasury": ""
+  "treasury": "0xF73938601C588bE60027938129a29Bbdde9D9CaC",
+  "targets": {
+    "proxy": "0xde4312acc4ac7c19a8f3041a82c5609423fa0291",
+    "logic": "0x5b8710b94983913224c1ab4616a097d470cc7c72",
+    "safeToken": "0x76fc507cbe8fe34964e683d90edf4bfbbae49d46",
+    "honeypotToken": "0x2b916eed3a3d32ca70a98d0e72881e9e86e2e9c5",
+    "holder": "0x000000000000000000000000000000000000f00d"
+  }
 }

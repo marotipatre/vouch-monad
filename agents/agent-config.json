@@ -1,37 +1,27 @@
 {
-  "1": {
-    "provider": "deterministic",
-    "model": "rule-engine",
-    "feeUsdc": 0.3
-  },
   "2": {
-    "provider": "groq",
-    "model": "llama-3.3-70b-versatile",
-    "feeUsdc": 0.6
+    "provider": "deterministic",
+    "model": "opcode-walker",
+    "feeUsdc": 0.5
   },
   "3": {
     "provider": "deterministic",
-    "model": "rule-engine",
-    "feeUsdc": 0.7
+    "model": "storage-reader",
+    "feeUsdc": 0.6
   },
   "4": {
     "provider": "deterministic",
-    "model": "rule-engine",
+    "model": "dispatcher-parser",
     "feeUsdc": 0.4
   },
   "5": {
     "provider": "deterministic",
-    "model": "rule-engine",
-    "feeUsdc": 0.3
+    "model": "evm-simulator",
+    "feeUsdc": 0.7
   },
   "6": {
-    "provider": "groq",
-    "model": "llama-3.3-70b-versatile",
-    "feeUsdc": 0.5
-  },
-  "7": {
     "provider": "naive",
     "model": "naive-rule",
-    "feeUsdc": 0.4
+    "feeUsdc": 0.3
   }
 }

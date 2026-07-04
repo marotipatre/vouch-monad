@@ -1,4 +1,4 @@
-# Vouch · Monad
+# AgentMonad
 
 **A trust layer for the AI-agent economy — on Monad.**
 
@@ -33,6 +33,32 @@ market, no DeepBook.
 
 ---
 
+## Deployed on Monad testnet (chain 10143)
+
+Explorer: [testnet.monadexplorer.com](https://testnet.monadexplorer.com) · RPC: `https://testnet-rpc.monad.xyz`
+
+**Core protocol**
+
+| Contract | Address | Explorer |
+|---|---|---|
+| MockUSDC | `0xce210d9a2096134bd578e18cf73f7f02010d63a1` | [view ↗](https://testnet.monadexplorer.com/address/0xce210d9a2096134bd578e18cf73f7f02010d63a1) |
+| AgentRegistry | `0xc35d29eac7e1bb578b0064c3eb1696f9038a3632` | [view ↗](https://testnet.monadexplorer.com/address/0xc35d29eac7e1bb578b0064c3eb1696f9038a3632) |
+| Insurance (escrow + reserve) | `0xabe3958492b2c3b8a96bfc76bc1e1a68855c2343` | [view ↗](https://testnet.monadexplorer.com/address/0xabe3958492b2c3b8a96bfc76bc1e1a68855c2343) |
+| Resolver (auditor oracle) | `0x7ff1e47ed335bb61545b48642a66a4f9c7ae8ccf` | [view ↗](https://testnet.monadexplorer.com/address/0x7ff1e47ed335bb61545b48642a66a4f9c7ae8ccf) |
+
+**Analysis targets** (what the agents inspect on-chain)
+
+| Contract | Address | Explorer |
+|---|---|---|
+| SampleProxy (EIP-1967, DELEGATECALL) | `0xde4312acc4ac7c19a8f3041a82c5609423fa0291` | [view ↗](https://testnet.monadexplorer.com/address/0xde4312acc4ac7c19a8f3041a82c5609423fa0291) |
+| SampleLogic (proxy implementation) | `0x5b8710b94983913224c1ab4616a097d470cc7c72` | [view ↗](https://testnet.monadexplorer.com/address/0x5b8710b94983913224c1ab4616a097d470cc7c72) |
+| SafeToken (freely transferable) | `0x76fc507cbe8fe34964e683d90edf4bfbbae49d46` | [view ↗](https://testnet.monadexplorer.com/address/0x76fc507cbe8fe34964e683d90edf4bfbbae49d46) |
+| HoneypotToken (sell-blocked) | `0x2b916eed3a3d32ca70a98d0e72881e9e86e2e9c5` | [view ↗](https://testnet.monadexplorer.com/address/0x2b916eed3a3d32ca70a98d0e72881e9e86e2e9c5) |
+
+Treasury / deployer: [`0xF73938601C588bE60027938129a29Bbdde9D9CaC`](https://testnet.monadexplorer.com/address/0xF73938601C588bE60027938129a29Bbdde9D9CaC) · auditor agent id: `1`
+
+---
+
 ## Architecture
 
 ```
@@ -40,7 +66,7 @@ contracts/         Solidity 0.8.24 (compiled with solc-js — no Foundry needed 
   src/  MockUSDC · AgentRegistry · Insurance (escrow + reserve) · Resolver · IERC20
   test/ Vouch.t.sol                         (forge test — optional)
 agents/            TypeScript backend (viem + express)
-  src/  chain.ts · onchain.ts · tasks.ts · server.ts · evidence.ts · llm.ts · abi.ts …
+  src/  chain.ts · onchain.ts · tasks.ts · server.ts · evidence.ts · abi.ts …
 web/               React + Vite + wagmi + RainbowKit (wallet-signed hires)
 scripts/           compile · deploy · seed · keys · balance · fund-auditor · topup-bond
 deployments/       monadTestnet.json (contract addresses) + evidence store (gitignored)
@@ -55,10 +81,12 @@ deployments/       monadTestnet.json (contract addresses) + evidence store (giti
 | `Resolver` | Auditor-gated settlement (atomic payout + slash + reliability update) |
 
 ### Agents (task classes)
-Provable (auditor re-derives from chain / recomputes):
-`erc20-safety` (freeze/mint risk from bytecode) · `contract-audit` (dangerous opcodes:
-SELFDESTRUCT/DELEGATECALL, via a real opcode walk) · `wallet-report` · `route` (best AMM
-route) · `defi-health` (health factor). Graded by a judge model: `general`.
+Four high-technical, on-chain-only agents — each does something an LLM can't, and the
+auditor re-derives the exact result from live chain state:
+- **`contract-audit`** — walks live bytecode opcodes to flag SELFDESTRUCT / DELEGATECALL
+- **`proxy-audit`** — reads raw EIP-1967 storage slots to reveal the proxy admin (upgrade control)
+- **`selector-scan`** — parses the bytecode dispatcher to recover a contract's function ABI
+- **`honeypot`** — eth_call-simulates a sell to detect tokens you can buy but can't sell
 
 ---
 
@@ -125,5 +153,3 @@ pnpm run test:contracts                 # forge test (needs Foundry + forge-std)
 
 Port of a Sui project; re-implemented in Solidity for Monad with DeepBook removed and
 reliability made performance-based.
-
-no commit

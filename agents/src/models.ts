@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PATH = join(__dirname, "..", "agent-config.json");
 
 export interface AgentConfig {
-  provider?: string; // groq | anthropic | deterministic
+  provider?: string; // deterministic | naive | groq
   model?: string;
   endpoint?: string; // if set, Vouch POSTs jobs to this internal (allowlisted) URL
   feeUsdc?: number; // price the agent owner charges per task (default 5)
@@ -31,8 +31,8 @@ export function setConfig(agentId: string, cfg: AgentConfig) {
 
 // Models a first-party listing can pick (used when no external endpoint is given).
 export const MODEL_CATALOG = [
-  { provider: "groq", model: "llama-3.1-8b-instant" },
-  { provider: "groq", model: "llama-3.3-70b-versatile" },
-  { provider: "anthropic", model: "claude-sonnet-4-6" },
-  { provider: "deterministic", model: "rule-engine" },
+  { provider: "deterministic", model: "opcode-walker" },
+  { provider: "deterministic", model: "storage-reader" },
+  { provider: "deterministic", model: "dispatcher-parser" },
+  { provider: "deterministic", model: "evm-simulator" },
 ];

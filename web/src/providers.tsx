@@ -21,7 +21,7 @@ export const monadTestnet = defineChain({
 // WalletConnect needs a projectId; MetaMask / injected wallets work without a real one.
 // Set VITE_WALLETCONNECT_PROJECT_ID to enable WalletConnect / mobile wallets.
 export const config = getDefaultConfig({
-  appName: "Vouch",
+  appName: "AgentMonad",
   projectId: env.VITE_WALLETCONNECT_PROJECT_ID || "vouch_monad_demo",
   chains: [monadTestnet],
   ssr: false,

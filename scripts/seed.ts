@@ -26,11 +26,12 @@ const REGISTRY = parseAbi([
 const ONE = 1_000_000n;
 
 const AGENTS = [
-  { name: "TokenSafetyChecker", taskClass: "erc20-safety", bond: 5, provider: "groq", model: "llama-3.3-70b-versatile", feeUsdc: 4 },
-  { name: "BytecodeAuditor", taskClass: "contract-audit", bond: 5, provider: "groq", model: "llama-3.3-70b-versatile", feeUsdc: 6 },
-  { name: "RouteOptimizer", taskClass: "route", bond: 3, provider: "groq", model: "llama-3.1-8b-instant", feeUsdc: 3 },
-  { name: "DeFiHealthChecker", taskClass: "defi-health", bond: 3, provider: "deterministic", model: "rule-engine", feeUsdc: 2 },
-  { name: "GeneralBot", taskClass: "general", bond: 2, provider: "groq", model: "llama-3.3-70b-versatile", feeUsdc: 2 },
+  { name: "BytecodeAuditor", taskClass: "contract-audit", bond: 5, provider: "deterministic", model: "opcode-walker", feeUsdc: 0.5 },
+  { name: "ProxyInspector", taskClass: "proxy-audit", bond: 5, provider: "deterministic", model: "storage-reader", feeUsdc: 0.6 },
+  { name: "SelectorRecoverer", taskClass: "selector-scan", bond: 3, provider: "deterministic", model: "dispatcher-parser", feeUsdc: 0.4 },
+  { name: "HoneypotSimulator", taskClass: "honeypot", bond: 5, provider: "deterministic", model: "evm-simulator", feeUsdc: 0.7 },
+  // deliberately-flawed agent for the insurance/slash demo — rubber-stamps tokens as safe
+  { name: "LazyHoneypotChecker", taskClass: "honeypot", bond: 3, provider: "naive", model: "naive-rule", feeUsdc: 0.3 },
 ];
 
 async function main() {

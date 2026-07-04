@@ -13,7 +13,7 @@ import {
 } from "./chain.js";
 import { getConfig, setConfig, MODEL_CATALOG } from "./models.js";
 
-const TASK_CLASSES: TaskClass[] = ["erc20-safety", "contract-audit", "wallet-report", "route", "defi-health", "general"];
+const TASK_CLASSES: TaskClass[] = ["contract-audit", "proxy-audit", "selector-scan", "honeypot"];
 
 // Only our own internal worker may be called — no user-supplied URLs reach fetch() (SSRF guard).
 const EXTRA_ORIGINS = (process.env.VOUCH_WORKER_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
@@ -99,11 +99,15 @@ app.get("/api/activity", (_req, res) =>
 app.get("/api/samples/:taskClass", (req, res) => {
   const tc = req.params.taskClass as TaskClass;
   const s = { ...(SAMPLES[tc] ?? {}) };
-  // On-chain tasks need a real address — default to the deployed contracts so every
-  // agent has a working one-click example.
-  if (tc === "erc20-safety" && !s.clean) { s.clean = d.usdc; s.tricky = d.usdc; }
-  if (tc === "contract-audit" && !s.clean) { s.clean = d.insurance; s.tricky = d.registry; }
-  if (tc === "wallet-report" && !s.clean) { s.clean = TREASURY; s.tricky = TREASURY; }
+  // One-click examples pointing at the deployed target contracts. "clean" = benign,
+  // "tricky" = the interesting/risky one that shows the agent + auditor catching something.
+  const t = d.targets;
+  if (t) {
+    if (tc === "contract-audit") { s.clean = t.safeToken; s.tricky = t.proxy; } // proxy has DELEGATECALL
+    if (tc === "proxy-audit") { s.clean = d.insurance; s.tricky = t.proxy; }    // insurance=direct, proxy=EIP-1967
+    if (tc === "selector-scan") { s.clean = t.safeToken; s.tricky = d.registry; }
+    if (tc === "honeypot") { s.clean = t.safeToken; s.tricky = t.honeypotToken; }
+  }
   res.json(s);
 });
 
@@ -233,7 +237,7 @@ app.post("/api/run", async (req, res) => {
 });
 
 app.listen(env.port, () => {
-  console.log(`vouch agent service (Monad) → http://localhost:${env.port}`);
+  console.log(`agentmonad agent service (Monad) → http://localhost:${env.port}`);
   console.log(`  mode   ${MOCK ? "MOCK (in-memory, no chain)" : "on-chain (Monad testnet)"}`);
   console.log(`  wallet ${ME}`);
   if (env.deployerKeyBad) console.warn(`  ⚠ DEPLOYER_PRIVATE_KEY is set but not a valid 0x + 64-hex key — deployer signer disabled`);

@@ -20,6 +20,7 @@ export const deployment: {
   auditorAgentId: number;
   treasury: string;
   explorer: string;
+  targets?: { proxy: string; logic: string; safeToken: string; honeypotToken: string; holder: string };
 } = existsSync(DEPLOY_PATH)
   ? JSON.parse(readFileSync(DEPLOY_PATH, "utf8"))
   : ({ chainId: 0, rpc: "", usdc: "", registry: "", insurance: "", resolver: "", auditorAgentId: 0, treasury: "", explorer: "" } as any);
@@ -45,21 +46,14 @@ export const env = {
   // set when a key was provided but couldn't be parsed — surfaced at startup + /api/health
   deployerKeyBad: !!process.env.DEPLOYER_PRIVATE_KEY?.trim() && !cleanKey(process.env.DEPLOYER_PRIVATE_KEY),
   auditorKeyBad: !!process.env.AUDITOR_PRIVATE_KEY?.trim() && !cleanKey(process.env.AUDITOR_PRIVATE_KEY),
-  // worker LLM (auditor is deterministic where possible). Provider: groq | anthropic | none
-  anthropicKey: process.env.ANTHROPIC_API_KEY?.trim() ?? "",
-  anthropicModel: process.env.WORKER_MODEL || "claude-sonnet-4-6",
+  // optional worker LLM (the 4 core agents are deterministic on-chain reads and use none).
   groqKey: process.env.GROQ_API_KEY?.trim() ?? "",
   groqModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
   explorer: process.env.EXPLORER_URL || deployment.explorer || "https://testnet.monadexplorer.com",
   port: Number(process.env.PORT || 8787),
 };
 
-// Resolve which worker LLM provider to use.
-export const llmProvider =
-  (process.env.LLM_PROVIDER || "").toLowerCase() ||
-  (env.groqKey ? "groq" : env.anthropicKey ? "anthropic" : "none");
-
-export const hasLLM =
-  (llmProvider === "groq" && !!env.groqKey) || (llmProvider === "anthropic" && !!env.anthropicKey);
-
-export const llmModel = llmProvider === "groq" ? env.groqModel : env.anthropicModel;
+// Optional worker LLM (Groq). The 4 core agents are deterministic and don't use it.
+export const llmProvider = (process.env.LLM_PROVIDER || "").toLowerCase() || (env.groqKey ? "groq" : "none");
+export const hasLLM = llmProvider === "groq" && !!env.groqKey;
+export const llmModel = env.groqModel;

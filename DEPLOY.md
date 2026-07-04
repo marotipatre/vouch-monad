@@ -1,4 +1,4 @@
-# Deploying Vouch (public, for judges)
+# Deploying AgentMonad (public, for judges)
 
 Two pieces, two hosts:
 

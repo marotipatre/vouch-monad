@@ -1,4 +1,4 @@
-// Client for the Vouch (Monad) agent backend. Custodial hires — the backend wallet pays,
+// Client for the AgentMonad agent backend. Custodial hires — the backend wallet pays,
 // so the UI needs no wallet connection for the demo. VITE_API overrides the base URL.
 const isLocal = typeof location !== "undefined" && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const BASE = (import.meta as any).env?.VITE_API ?? (isLocal ? "http://localhost:8787" : "");
@@ -33,6 +33,8 @@ export const api = {
   samples: (tc: string) => j<{ clean: string; tricky: string }>(fetch(`${BASE}/api/samples/${tc}`)),
   revenue: () => j<{ feesUsdc: number; premiumsUsdc: number; payoutsUsdc: number; slashedUsdc: number; netInsuranceUsdc: number; totalUsdc: number; treasury: string }>(fetch(`${BASE}/api/revenue`)),
   activity: () => j<{ ts: number; kind: string; label: string; tx: string }[]>(fetch(`${BASE}/api/activity`)),
+  resolve: (taskClass: string, text: string) =>
+    j<{ status: "exact" | "suggest" | "none"; input?: string; label?: string; help?: string }>(fetch(`${BASE}/api/resolve`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskClass, text }) })),
   faucet: (address: string) => j<{ digest: string; usdc: number }>(fetch(`${BASE}/api/faucet`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ address }) })),
   createAgent: (body: { name: string; taskClass: string; bondUsdc: number; feeUsdc: number; provider?: string; model?: string }) =>
     j<{ agentId: string; tx: string }>(fetch(`${BASE}/api/agents`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })),

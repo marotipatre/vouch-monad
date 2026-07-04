@@ -154,7 +154,7 @@ export default function App() {
 
   const passRate = selected && selected.jobs ? Math.round(((selected.jobs - selected.fails) / selected.jobs) * 100) : 100;
   const term = [
-    `vouch trust terminal — ${health ? (health.mock ? "MOCK · in-memory" : health.network) + " · worker " + health.provider : "connecting…"}`,
+    `agentmonad trust terminal — ${health ? (health.mock ? "MOCK · in-memory" : health.network) + " · worker " + health.provider : "connecting…"}`,
     ...(termLines.length ? termLines.slice(-40) : ["idle · select an agent and Hire & run to stream live on-chain steps"]),
   ];
 
@@ -162,7 +162,7 @@ export default function App() {
     <div className="flex h-screen flex-col overflow-hidden bg-slate-950 text-slate-100" style={{ fontFamily: "'Inter',system-ui,sans-serif" }}>
       <header className="flex items-center justify-between border-b border-slate-800 px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <button onClick={() => { window.location.hash = ""; }} className="font-display text-base font-bold tracking-tight hover:text-indigo-300" title="Home">⬡ Vouch <span className="text-violet-400">· Monad</span></button>
+          <button onClick={() => { window.location.hash = ""; }} className="font-display text-base font-bold tracking-tight hover:text-indigo-300" title="Home">⬡ Agent <span className="text-violet-400">· Monad</span></button>
           {selected && <span className="rounded-md bg-slate-800 px-2 py-1 text-xs text-slate-200">{selected.name}</span>}
           {health && <span className={`rounded px-2 py-0.5 text-[10px] font-semibold uppercase ${health.mock ? "bg-amber-500/20 text-amber-300" : "bg-emerald-500/20 text-emerald-300"}`}>{health.mock ? "mock" : "testnet"}</span>}
         </div>
@@ -356,54 +356,42 @@ function Panel({ title, right, children, className = "" }: { title: string; righ
 
 function FormattedResult({ taskClass, result }: { taskClass: string; result: any }) {
   if (!result) return <span className="text-slate-500">—</span>;
-  if (taskClass === "general")
-    return <p className="whitespace-pre-wrap break-words leading-relaxed text-slate-200">{result.answer ?? JSON.stringify(result)}</p>;
-  if (taskClass === "erc20-safety")
-    return (
-      <div className="space-y-1">
-        <div className="flex justify-between"><span className="text-slate-400">Can be frozen (pausable / blacklist)</span><b className={result.freezable ? "text-rose-300" : "text-slate-200"}>{result.freezable ? "Yes ⚠" : "No"}</b></div>
-        <div className="flex justify-between"><span className="text-slate-400">Publicly mintable</span><b className={result.publiclyMintable ? "text-rose-300" : "text-slate-200"}>{result.publiclyMintable ? "Yes ⚠" : "No"}</b></div>
-      </div>
-    );
+  const short = (a?: string | null) => (a ? `${a.slice(0, 8)}…${a.slice(-6)}` : "—");
+
   if (taskClass === "contract-audit") {
     const risky: string[] = result.risky ?? [];
     return risky.length ? (
       <div>
-        <div className="mb-1 text-slate-400">{risky.length} risky op{risky.length > 1 ? "s" : ""}:</div>
+        <div className="mb-1 text-slate-400">{risky.length} dangerous op{risky.length > 1 ? "s" : ""} found:</div>
         <ul className="space-y-0.5">{risky.map((f, i) => <li key={i} className="font-mono text-rose-300">• {f}</li>)}</ul>
       </div>
-    ) : <span className="text-slate-200">No dangerous low-level ops found.</span>;
+    ) : <span className="text-slate-200">No dangerous low-level ops (SELFDESTRUCT / DELEGATECALL) found.</span>;
   }
-  if (taskClass === "route")
+  if (taskClass === "proxy-audit")
     return (
       <div className="space-y-1">
-        <div className="flex justify-between"><span className="text-slate-400">Best route</span><b className="text-slate-100">{result.bestDex}</b></div>
-        <div className="flex justify-between"><span className="text-slate-400">Output</span><b className="tabular-nums text-slate-100">{result.amountOut}</b></div>
+        <div className="flex justify-between"><span className="text-slate-400">Upgradeable proxy?</span><b className={result.isProxy ? "text-amber-300" : "text-emerald-300"}>{result.isProxy ? "Yes ⚠" : "No"}</b></div>
+        <div className="flex justify-between"><span className="text-slate-400">Type</span><b className="text-slate-100">{result.kind}</b></div>
+        {result.implementation && <div className="flex justify-between"><span className="text-slate-400">Implementation</span><code className="text-slate-200">{short(result.implementation)}</code></div>}
+        {result.admin && <div className="flex justify-between"><span className="text-slate-400">Admin (can swap logic)</span><code className="text-amber-300">{short(result.admin)}</code></div>}
       </div>
     );
-  if (taskClass === "wallet-report") {
-    const coins: any[] = result.coins ?? [];
+  if (taskClass === "selector-scan") {
+    const sels: string[] = result.selectors ?? [];
     return (
-      <div className="space-y-2">
-        {result.summary && <p className="text-slate-200">{result.summary}</p>}
-        <div className="flex gap-4 text-slate-400"><span>native <b className="text-slate-100">{result.native}</b></span><span>tokens <b className="text-slate-100">{result.coinTypes}</b></span></div>
-        <div className="space-y-0.5">
-          {coins.slice(0, 8).map((c, i) => (
-            <div key={i} className="flex justify-between font-mono text-[11px]"><span className="text-slate-400">{String(c.token).slice(0, 10)}…</span><span className="tabular-nums text-slate-200">{c.balance}</span></div>
-          ))}
-        </div>
+      <div>
+        <div className="mb-1 text-slate-400">Recovered {result.count ?? sels.length} function selector(s) from bytecode:</div>
+        <div className="flex flex-wrap gap-1">{sels.map((s, i) => <span key={i} className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-200">{s}</span>)}</div>
       </div>
     );
   }
-  if (taskClass === "defi-health") {
-    const hf = Number(result.healthFactor);
+  if (taskClass === "honeypot")
     return (
       <div className="space-y-1">
-        <div className="flex justify-between"><span className="text-slate-400">Health factor</span><b className={hf < 1.2 ? "text-rose-300" : hf < 1.5 ? "text-amber-300" : "text-emerald-300"}>{result.healthFactor}</b></div>
-        <div className="flex justify-between"><span className="text-slate-400">Liquidation buffer</span><b className="text-slate-100">{result.maxDrawdownPct}% drop</b></div>
+        <div className="flex justify-between"><span className="text-slate-400">Selling restricted?</span><b className={result.honeypot ? "text-rose-300" : "text-emerald-300"}>{result.honeypot ? "Yes — selling is blocked" : "No — freely transferable"}</b></div>
+        <div className="text-[11px] text-slate-400">{result.reason}</div>
       </div>
     );
-  }
   return <pre className="whitespace-pre-wrap break-words text-slate-200">{JSON.stringify(result, null, 1)}</pre>;
 }
 

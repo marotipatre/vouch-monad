@@ -92,7 +92,22 @@ async function main() {
   await write(usdc, usdcAbi, "approve", [insurance, 500n * ONE]);
   await write(insurance, insuranceAbi, "deposit", [500n * ONE]); // seed reserve
 
-  const out = { chainId: CHAIN_ID, rpc: RPC, explorer: EXPLORER, usdc, registry, insurance, resolver, auditorAgentId, treasury: TREASURY };
+  // Analysis targets the agents inspect on-chain.
+  console.log("Deploying analysis targets…");
+  const HOLDER = "0x000000000000000000000000000000000000f00d"; // funded non-owner holder for the sell sim
+  const logic = await deploy("SampleLogic");
+  const proxy = await deploy("SampleProxy", [logic, deployer.address]); // EIP-1967 proxy (delegatecall)
+  const safeToken = await deploy("SafeToken");
+  const honeypotToken = await deploy("HoneypotToken");
+  const TOKENS = 1000n * 10n ** 18n;
+  await write(safeToken, artifact("SafeToken").abi, "transfer", [HOLDER, TOKENS]);
+  await write(honeypotToken, artifact("HoneypotToken").abi, "transfer", [HOLDER, TOKENS]);
+  console.log(`  funded holder ${HOLDER} with SafeToken + HoneypotToken`);
+
+  const out = {
+    chainId: CHAIN_ID, rpc: RPC, explorer: EXPLORER, usdc, registry, insurance, resolver, auditorAgentId, treasury: TREASURY,
+    targets: { proxy, logic, safeToken, honeypotToken, holder: HOLDER },
+  };
   writeFileSync(join(ROOT, "deployments", "monadTestnet.json"), JSON.stringify(out, null, 2) + "\n");
   console.log("Wrote deployments/monadTestnet.json ✓");
 }

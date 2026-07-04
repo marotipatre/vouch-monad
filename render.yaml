@@ -10,7 +10,7 @@ services:
     runtime: node
     plan: free
     region: oregon
-    # --prod=false so pnpm keeps devDependencies (tsx runs the TypeScript server).
+    # Render already provides pnpm; --prod=false keeps devDependencies (tsx runs the server).
     buildCommand: pnpm install --prod=false
     startCommand: pnpm --filter @vouch-monad/agents serve
     healthCheckPath: /api/health

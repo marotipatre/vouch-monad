@@ -1,0 +1,37 @@
+{
+  "1": {
+    "provider": "deterministic",
+    "model": "rule-engine",
+    "feeUsdc": 0.3
+  },
+  "2": {
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
+    "feeUsdc": 0.6
+  },
+  "3": {
+    "provider": "deterministic",
+    "model": "rule-engine",
+    "feeUsdc": 0.7
+  },
+  "4": {
+    "provider": "deterministic",
+    "model": "rule-engine",
+    "feeUsdc": 0.4
+  },
+  "5": {
+    "provider": "deterministic",
+    "model": "rule-engine",
+    "feeUsdc": 0.3
+  },
+  "6": {
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
+    "feeUsdc": 0.5
+  },
+  "7": {
+    "provider": "naive",
+    "model": "naive-rule",
+    "feeUsdc": 0.4
+  }
+}

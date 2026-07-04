@@ -42,7 +42,7 @@ Explorer: [testnet.monadexplorer.com](https://testnet.monadexplorer.com) · RPC:
 | Contract | Address | Explorer |
 |---|---|---|
 | MockUSDC | `0xce210d9a2096134bd578e18cf73f7f02010d63a1` | [view ↗](https://testnet.monadexplorer.com/address/0xce210d9a2096134bd578e18cf73f7f02010d63a1) |
-| AgentRegistry | `0xc35d29eac7e1bb578b0064c3eb1696f9038a3632` | [view ↗](https://testnet.monadexplorer.com/address/0xc35d29eac7e1bb578b0064c3eb1696f9038a3632) |
+| AgentRegistry(ERC 8004) | `0xc35d29eac7e1bb578b0064c3eb1696f9038a3632` | [view ↗](https://testnet.monadexplorer.com/address/0xc35d29eac7e1bb578b0064c3eb1696f9038a3632) |
 | Insurance (escrow + reserve) | `0xabe3958492b2c3b8a96bfc76bc1e1a68855c2343` | [view ↗](https://testnet.monadexplorer.com/address/0xabe3958492b2c3b8a96bfc76bc1e1a68855c2343) |
 | Resolver (auditor oracle) | `0x7ff1e47ed335bb61545b48642a66a4f9c7ae8ccf` | [view ↗](https://testnet.monadexplorer.com/address/0x7ff1e47ed335bb61545b48642a66a4f9c7ae8ccf) |
 
